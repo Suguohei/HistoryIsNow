@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/username"
         android:layout_alignParentBottom="true"
-        android:text="suguoqing"
         android:textColor="#fff"
         android:textSize="14sp"
         />
@@ -26,7 +25,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/email"
         android:layout_above="@+id/username"
-        android:text="7198302331@qq.com"
         android:textColor="#fff"
         android:textSize="14sp"
         />
