@@ -1,5 +1,8 @@
 package com.example.suguoqing.historyisnow;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -115,6 +118,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         .show();
                 
             }else{
+                //登录进去，把用户保存在缓存中，为了下次打开直接是上次的状态
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("username",str);
+                editor.apply();
+                //登录进去之后跳到主界面,同时清除之前的全部界面
+                Intent intent = new Intent(this,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                //finish();
                 Toast.makeText(this, "可以登录进去了", Toast.LENGTH_SHORT).show();
             }
         }

@@ -1,7 +1,9 @@
 package com.example.suguoqing.historyisnow;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.UserManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.suguoqing.bean.User;
+import com.example.suguoqing.util.UserCUID;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
@@ -65,8 +68,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         circleImageView.setOnClickListener(this);
         username.setOnClickListener(this);
         email.setOnClickListener(this);
-
-
         btn.setOnClickListener(this);
 
         //设置ToolBar
@@ -112,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case R.id.nav_setting:
                         Toast.makeText(MainActivity.this, "shin", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+                        startActivity(intent);
                         break;
                     case R.id.nav_about:
                         Toast.makeText(MainActivity.this, "shin", Toast.LENGTH_SHORT).show();
@@ -139,8 +142,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return true;
     }
-//处理刷新
+//每次打开导航栏都刷新
     private void reflashDrawer() {
+        //判断shareprefence中有没有缓存，如果有说明已经登录过了，就可以直接在头像下面的状态栏显示姓名
+        SharedPreferences preferences = getSharedPreferences("com.example.suguoqing.historyisnow_preferences",MODE_PRIVATE);
+        String name = preferences.getString("username","");
+        Log.d(TAG, "reflashDrawer: ++++++++++++++"+name);
+        if(name != null && name != ""){
+            username.setText(name);
+            User user = UserCUID.getUserByname(name);
+            Log.d(TAG, "reflashDrawer: ______________________"+user);
+            if(user != null){
+                //判断有没有设置头像和邮箱等信息
+                if(user.getEmail() != null && user.getEmail() != ""){
+                    email.setText(user.getEmail());
+                }else if(user.getImg() != null){
+                    //处理头像
+                    Log.d(TAG, "reflashDrawer: +++++++++++++++++++++处理头像");
+                }
+            }
+        }
 
     }
 
@@ -168,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    //处理头像
+    //判断用户有没有登录处理头像，如果登录就到设置头像界面，如果没有就到登录注册界面。
     private void handlerHead() {
         //判断有没有登录
         if("".equals(username.getText()) || username.getText() == null){
