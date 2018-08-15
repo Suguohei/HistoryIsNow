@@ -157,18 +157,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //判断shareprefence中有没有缓存，如果有说明已经登录过了，就可以直接在头像下面的状态栏显示姓名
         SharedPreferences preferences = getSharedPreferences("com.example.suguoqing.historyisnow_preferences",MODE_PRIVATE);
         String name = preferences.getString("username","");
-        Log.d(TAG, "reflashDrawer: ++++++++++++++"+name);
         if(name != null && name != ""){
             username.setText(name);
             User user = UserCUID.getUserByname(name);
-            Log.d(TAG, "reflashDrawer: ______________________"+user);
             if(user != null){
                 //判断有没有设置头像和邮箱等信息
                 if(user.getEmail() != null && user.getEmail() != ""){
                     email.setText(user.getEmail());
                 }else if(user.getImg() != null){
                     //处理头像
-                    Log.d(TAG, "reflashDrawer: +++++++++++++++++++++处理头像");
+                    refreshHeadPhoto(name);
                 }
             }
         }
@@ -224,28 +222,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(resultCode == RESULT_OK){
                     String name = data.getStringExtra("name");
                     Log.d(TAG, "onActivityResult: "+name);
-                    User user = DataSupport.where("name = ?",name)
-                            .find(User.class).get(0);
-                    if(user.getImg() != null){
-                        File file = new File(user.getImg());
-                        if(file.exists()){
-                            Uri outputUri = Uri.fromFile(file);
-
-                            Glide.with(this)
-                                    .load(outputUri)
-                                    .into(circleImageView);
-
-
-                            Glide.with(this)
-                                    .load(outputUri)
-                                    .bitmapTransform(new BlurTransformation(this, 20))
-                                    .into(nav_backimg);
-
-                        }
-
-                    }
+                    refreshHeadPhoto(name);
                 }
                 break;
+        }
+    }
+
+    /**
+     * 处理重新打开侧栏刷新图像
+     */
+    private void refreshHeadPhoto(String name){
+        User user = DataSupport.where("name = ?",name)
+                .find(User.class).get(0);
+        if(user.getImg() != null){
+            File file = new File(user.getImg());
+            if(file.exists()){
+                Uri outputUri = Uri.fromFile(file);
+
+                Glide.with(this)
+                        .load(outputUri)
+                        .into(circleImageView);
+
+
+                Glide.with(this)
+                        .load(outputUri)
+                        .bitmapTransform(new BlurTransformation(this, 20))
+                        .into(nav_backimg);
+
+            }
+
         }
     }
 }

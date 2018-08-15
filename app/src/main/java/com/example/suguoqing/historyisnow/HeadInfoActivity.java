@@ -23,6 +23,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -62,8 +63,6 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
     private Uri imguri;//拍照相片保存地址
     private Uri outputUri;//裁剪完照片保存地址
     private String imagePath;//打开相册选择照片的路径
-    private boolean isClickCamera;//是否是拍照裁剪
-    private  boolean isChanceHead = false;//是否更换的头像
     private User user;//当前用户
 
     @Override
@@ -152,7 +151,25 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
                 }
                 break;
             case R.id.head_info_btn:
-                //点击拍照，打开摄像头
+               File file = new File(Environment.getExternalStorageDirectory(),"take_photo.jpg");
+                try {
+                    if(file.exists()){
+                        file.delete();
+                    }
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(Build.VERSION.SDK_INT >= 24){
+                    imguri = FileProvider.getUriForFile(HeadInfoActivity.this,"com.example.suguoqing.historyisnow.fileprovider",file);
+
+                }else{
+                    imguri = Uri.fromFile(file);
+                }
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,imguri);
+                startActivityForResult(intent,TAKE_PHOTO);
+
                 break;
                 default:
                     break;
@@ -198,13 +215,14 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode){
             case TAKE_PHOTO:
-                if(requestCode == RESULT_OK){
-                   // try {
-                        //Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imguri));
-                        Glide.with(this).load(imguri);
-                    //} catch (FileNotFoundException e) {
-                     //   e.printStackTrace();
-                   // }
+                if (hasSdcard()) {
+                    File tempFile = new File(
+                           Environment.getExternalStorageDirectory(),
+                            "take_photo.jpg");
+                    cropPhoto(Uri.fromFile(tempFile));
+                } else {
+                    Toast.makeText(getApplication(), "没有SDCard!", Toast.LENGTH_LONG)
+                            .show();
                 }
                 break;
 
@@ -222,7 +240,9 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case PICTURE_CUT://裁剪完成
 
-                refresh();
+                if(resultCode == RESULT_OK){
+                    refresh();
+                }
 
                 break;
         }
@@ -338,5 +358,18 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
         intent.putExtra("noFaceDetection", true);//取消人脸识别
         startActivityForResult(intent, PICTURE_CUT);
 
+    }
+
+    /**
+     * 检查设备是否存在SDCard的工具方法
+     */
+    public static boolean hasSdcard() {
+        String state = Environment.getExternalStorageState();
+        if (state.equals(Environment.MEDIA_MOUNTED)) {
+            // 有存储的SDCard
+            return true;
+        } else {
+            return false;
+        }
     }
 }
