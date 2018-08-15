@@ -164,7 +164,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //判断有没有设置头像和邮箱等信息
                 if(user.getEmail() != null && user.getEmail() != ""){
                     email.setText(user.getEmail());
-                }else if(user.getImg() != null){
+                }
+                if(user.getImg() != null){
                     //处理头像
                     refreshHeadPhoto(name);
                 }

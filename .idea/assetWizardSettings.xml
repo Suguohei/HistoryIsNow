@@ -34,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/home/suguoqing/公共的/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_add_a_photo_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/home/suguoqing/公共的/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/communication/ic_email_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -45,7 +45,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="outputName" value="img_takephoto" />
+                                      <entry key="outputName" value="img_emil" />
                                     </map>
                                   </option>
                                 </PersistentState>

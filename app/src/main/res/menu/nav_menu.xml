@@ -15,6 +15,8 @@
             android:icon="@mipmap/img_setting"
             android:title="设置"
             />
+    </group>
+    <group android:id="@+id/group_about">
         <item
             android:id="@+id/nav_about"
             android:icon="@mipmap/img_about"

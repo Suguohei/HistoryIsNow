@@ -105,7 +105,7 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
 
         LinearLayoutManager manager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(manager);
-        Head_info_Adapter adapter = new Head_info_Adapter(list,this);
+        Head_info_Adapter adapter = new Head_info_Adapter(list,this,user);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
 
