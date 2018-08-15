@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.os.StrictMode;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -34,11 +36,15 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.signature.StringSignature;
+import com.example.suguoqing.bean.User;
+
+import org.litepal.crud.DataSupport;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.glide.transformations.BlurTransformation;
@@ -58,14 +64,35 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
     private String imagePath;//打开相册选择照片的路径
     private boolean isClickCamera;//是否是拍照裁剪
     private  boolean isChanceHead = false;//是否更换的头像
+    private User user;//当前用户
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //让顶部的状态栏和背景合二为一
+        if(Build.VERSION.SDK_INT >= 21){
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            );
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+
         setContentView(R.layout.activity_head_info);
 
+        //获取当前用户
+        Intent intent = getIntent();
+        //Bundle bundle = intent.getBundleExtra("bundle");
+       // user = (User) bundle.getSerializable("user");
+        String name = intent.getStringExtra("name");
+        user = DataSupport.where("name = ?",name).find(User.class).get(0);
+
+        Log.d(TAG, "onCreate: user is"+ user+"---------"+user.getImg());
+
+
         circleImageView = findViewById(R.id.head_info_img);
-        //imageView = findViewById(R.id.head_info_backimag);
+        imageView = findViewById(R.id.head_info_backimg);
         layout = findViewById(R.id.head_info_coll);
         btn = findViewById(R.id.head_info_btn);
         recyclerView = findViewById(R.id.head_info_recycle);
@@ -89,23 +116,25 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
 
     private void refresh() {
         //换了头像就显示它的背景，并且加载头像
-        if(!isChanceHead){
-            Log.d(TAG, "refresh: ================="+this.getExternalCacheDir());
-            File file = new File(getExternalCacheDir(), "crop_image.jpg");
+
+        if(user.getImg() != null){
+            File file = new File(user.getImg());
             if(file.exists()){
+
                 outputUri = Uri.fromFile(file);
-                //RequestOptions requestOptions = new RequestOptions().signature(new ObjectKey(System.currentTimeMillis()));
-                String updateTime = String.valueOf(System.currentTimeMillis());
+
                 Glide.with(this)
                         .load(outputUri)
-                        //.apply(requestOptions)
-                        .signature(new StringSignature(updateTime))
                         .into(circleImageView);
 
 
-               // imageView.setBackgroundResource(R.drawable.ic_launcher_background);
+                Glide.with(this)
+                        .load(outputUri)
+                        .bitmapTransform(new BlurTransformation(this, 20))
+                        .into(imageView);
 
             }
+            
         }
 
     }
@@ -156,6 +185,15 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
+    //重写返回键代码
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra("name",user.getName());
+        setResult(RESULT_OK,intent);
+        finish();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode){
@@ -183,13 +221,9 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
                 }
                 break;
             case PICTURE_CUT://裁剪完成
-                //当使用Glide加载的时候，图片总是不会变化，是由于，Glide有缓存，当uri没有变，Glide会先加载缓存。
-               // RequestOptions requestOptions = new RequestOptions().signature(new ObjectKey(System.currentTimeMillis()));
-                String updateTime = String.valueOf(System.currentTimeMillis());
-                Glide.with(this)
-                        .load(outputUri)
-                        .signature(new StringSignature(updateTime))
-                        .into(circleImageView);
+
+                refresh();
+
                 break;
         }
 
@@ -209,11 +243,9 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
       imagePath = null;
         Uri uri = data.getData();
         //Glide.with(this).load(uri).into(circleImageView);
-        Log.d(TAG, "handleImageOnKitkat: ------------------------"+uri);
         if(DocumentsContract.isDocumentUri(this,uri)){
             //如果是document类型的uri，则通过document id处理
             String docId = DocumentsContract.getDocumentId(uri);
-            Log.d(TAG, "handleImageOnKitkat: -------------"+docId);
             if("com.android.providers.media.documents".equals(uri.getAuthority())){
                 String id = docId.split(":")[1];
                 String selection = MediaStore.Images.Media._ID + "=" + id;
@@ -266,8 +298,9 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
      * 裁剪图片
      */
     private void cropPhoto(Uri uri) {
+        String currentTime = Long.toString(System.currentTimeMillis());
         // 创建File对象，用于存储裁剪后的图片，避免更改原图
-        File file = new File(getExternalCacheDir(), "crop_image.jpg");
+        File file = new File(getExternalCacheDir(), currentTime+".jpg");
         //File file = new File(Environment.getExternalStorageDirectory(),"crop_image.jpg");
 
         try {
@@ -275,7 +308,6 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
                 file.delete();
             }
             file.createNewFile();
-            Log.d(TAG, "cropPhoto: -------------"+file.length());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -286,6 +318,12 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }
         intent.setDataAndType(uri, "image/*");
+
+        user.setImg(file.getPath());
+        Log.d(TAG, "cropPhoto: +"+user.getImg());
+        user.save();
+
+        Log.d(TAG, "refresh: 为空 + outputuri"+outputUri);
         //裁剪图片的宽高比例
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
@@ -299,5 +337,6 @@ public class HeadInfoActivity extends AppCompatActivity implements View.OnClickL
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());//输出图片格式
         intent.putExtra("noFaceDetection", true);//取消人脸识别
         startActivityForResult(intent, PICTURE_CUT);
+
     }
 }

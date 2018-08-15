@@ -2,7 +2,10 @@ package com.example.suguoqing.historyisnow;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.UserManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -16,9 +19,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.suguoqing.bean.User;
 import com.example.suguoqing.util.UserCUID;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -28,12 +33,14 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import org.litepal.crud.DataSupport;
 import org.litepal.tablemanager.Connector;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "MainActivity";
@@ -47,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private CircleImageView circleImageView;
         private TextView username;
         private TextView email;
+        private ImageView nav_backimg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +69,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn = findViewById(R.id.float_btn);
         navigationView = findViewById(R.id.nav_view);
         View drawerView = navigationView.inflateHeaderView(R.layout.nav_header);//把头部加进去
+
         //实现头部监听
         circleImageView = drawerView.findViewById(R.id.icon_image);
+        nav_backimg = drawerView.findViewById(R.id.nav_backimg);
         username = drawerView.findViewById(R.id.username);
         email = drawerView.findViewById(R.id.email);
         circleImageView.setOnClickListener(this);
@@ -200,15 +210,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else {
             //获取这个user，根据username来获取
             String name = (String) username.getText();
-            List<User> users = DataSupport.where("name = ?",name).find(User.class);
             Intent intent = new Intent(this,HeadInfoActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("user",users.get(0));
-            intent.putExtra("bundler",bundle);
-            startActivity(intent);
+            intent.putExtra("name",name);
+            startActivityForResult(intent,1);
         }
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode){
+            case 1:
+                if(resultCode == RESULT_OK){
+                    String name = data.getStringExtra("name");
+                    Log.d(TAG, "onActivityResult: "+name);
+                    User user = DataSupport.where("name = ?",name)
+                            .find(User.class).get(0);
+                    if(user.getImg() != null){
+                        File file = new File(user.getImg());
+                        if(file.exists()){
+                            Uri outputUri = Uri.fromFile(file);
 
+                            Glide.with(this)
+                                    .load(outputUri)
+                                    .into(circleImageView);
+
+
+                            Glide.with(this)
+                                    .load(outputUri)
+                                    .bitmapTransform(new BlurTransformation(this, 20))
+                                    .into(nav_backimg);
+
+                        }
+
+                    }
+                }
+                break;
+        }
+    }
 }
