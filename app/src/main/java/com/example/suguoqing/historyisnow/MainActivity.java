@@ -15,6 +15,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.suguoqing.bean.Note;
 import com.example.suguoqing.bean.User;
 import com.example.suguoqing.util.UserCUID;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -55,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private TextView username;
         private TextView email;
         private ImageView nav_backimg;
+        private String selectedDate;
+        private RecyclerView note_recycle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawerLayout = findViewById(R.id.drawer_layout);
         btn = findViewById(R.id.float_btn);
         navigationView = findViewById(R.id.nav_view);
+        note_recycle = findViewById(R.id.note_recycle);
         View drawerView = navigationView.inflateHeaderView(R.layout.nav_header);//把头部加进去
 
         //实现头部监听
@@ -92,9 +99,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+
                 int year = date.getYear();
                 int month = date.getMonth();
                 int day = date.getDay();
+                selectedDate = year+"/"+(month+1)+"/"+day;
                 Toast.makeText(MainActivity.this, ""+year+"年"+(month+1)+"月"+day+"日", Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(MainActivity.this,DetailActivity.class);
@@ -179,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.float_btn:
                 Toast.makeText(this, "hahah  dian ji wo ", Toast.LENGTH_SHORT).show();
+                headlerBtn();
                 break;
             case R.id.icon_image:
                 Toast.makeText(this, "icom_image", Toast.LENGTH_SHORT).show();
@@ -195,6 +205,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             default:
                 break;
+        }
+    }
+
+    /**
+     * 点击floatbutton
+     */
+    private void headlerBtn() {
+        reflashDrawer();
+        //判断有没有登录
+        if("".equals(username.getText()) || username.getText() == null){
+            Toast.makeText(this, "没有登录", Toast.LENGTH_SHORT).show();
+        }else {
+            //获取这个user，根据username来获取
+            String name = (String) username.getText();
+            Intent intent = new Intent(this,WriteNoteActivity.class);
+            intent.putExtra("name",name);
+            if(selectedDate == null){
+                SimpleDateFormat spformat = new SimpleDateFormat("yyyy/MM/dd");
+                selectedDate = spformat.format(new Date()).toString();
+            }
+            intent.putExtra("date",selectedDate);
+            startActivityForResult(intent,2);
         }
     }
 
@@ -226,8 +258,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     refreshHeadPhoto(name);
                 }
                 break;
+            case 2:
+                if(resultCode == RESULT_OK){
+                    String name = data.getStringExtra("name");
+                    String date = data.getStringExtra("date");
+                    refreshNotes(name,date);
+                }
+
+                break;
         }
     }
+
+    /**
+     *在日历下显示note
+     */
+    private void refreshNotes(String name,String date) {
+        List<Note> notes = DataSupport.where("username = ? and date = ?", name,date).find(Note.class);
+        Log.d(TAG, "refreshNotes: aaa"+notes.size());
+        for(Note n : notes){
+            Log.d(TAG, "refreshNotes: aaa"+n);
+        }
+        if(notes != null && notes.size() != 0){
+           NoteAdapter adapter = new NoteAdapter(notes,this);
+            LinearLayoutManager manager = new LinearLayoutManager(this);
+            note_recycle.setLayoutManager(manager);
+            note_recycle.setAdapter(adapter);
+            note_recycle.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
+        }
+
+    }
+
 
     /**
      * 处理重新打开侧栏刷新图像

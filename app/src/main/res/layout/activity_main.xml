@@ -7,50 +7,62 @@
     android:id="@+id/drawer_layout"
     tools:context=".MainActivity">
 
-    <android.widget.LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+   <FrameLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       >
 
-        <android.support.design.widget.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+       <android.widget.LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:orientation="vertical"
+           >
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorPrimary"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                >
-            </android.support.v7.widget.Toolbar>
-        </android.support.design.widget.AppBarLayout>
-        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-            android:id="@+id/calendar_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:mcv_calendarMode="month"
-            app:mcv_weekDayLabels="@array/weak"
-            app:mcv_monthLabels="@array/month"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            app:mcv_arrowColor="@color/colorAccent">
+           <android.support.design.widget.AppBarLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               >
 
-        </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
+               <android.support.v7.widget.Toolbar
+                   android:id="@+id/toolbar"
+                   android:layout_width="match_parent"
+                   android:layout_height="?attr/actionBarSize"
+                   android:background="@color/colorPrimary"
+                   android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                   >
+               </android.support.v7.widget.Toolbar>
+           </android.support.design.widget.AppBarLayout>
+           <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+               android:id="@+id/calendar_view"
+               android:layout_width="match_parent"
+               android:layout_height="380dp"
+               app:mcv_calendarMode="month"
+               app:mcv_weekDayLabels="@array/weak"
+               app:mcv_monthLabels="@array/month"
+               app:layout_behavior="@string/appbar_scrolling_view_behavior"
+               app:mcv_arrowColor="@color/colorAccent">
 
+           </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
 
-        <android.support.design.widget.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/img_add"
-            android:layout_gravity="end|bottom"
-            android:layout_marginBottom="20dp"
-            android:layout_marginRight="20dp"
-            android:id="@+id/float_btn"
-          />
+           <android.support.v7.widget.RecyclerView
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:id="@+id/note_recycle">
 
-    </android.widget.LinearLayout>
+           </android.support.v7.widget.RecyclerView>
+
+       </android.widget.LinearLayout>
+
+       <android.support.design.widget.FloatingActionButton
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:src="@mipmap/img_add"
+           android:layout_gravity="end|bottom"
+           android:layout_marginBottom="20dp"
+           android:layout_marginRight="20dp"
+           android:id="@+id/float_btn"
+           />
+   </FrameLayout>
 
     <android.support.design.widget.NavigationView
         android:layout_width="match_parent"
@@ -61,5 +73,7 @@
         >
 
     </android.support.design.widget.NavigationView>
+
+
 
 </android.support.v4.widget.DrawerLayout>

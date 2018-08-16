@@ -8,8 +8,26 @@ import java.util.Date;
 public class Note extends DataSupport implements Serializable{
     private String title;
     private String content;
-    private Date date;
+    private String date;
     private String note_img;
+    private String username;
+    private String time;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public String getTitle() {
         return title;
@@ -27,11 +45,11 @@ public class Note extends DataSupport implements Serializable{
         this.content = content;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -43,13 +61,16 @@ public class Note extends DataSupport implements Serializable{
         this.note_img = note_img;
     }
 
+
     @Override
     public String toString() {
         return "Note{" +
                 "title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", date=" + date +
+                ", date='" + date + '\'' +
                 ", note_img='" + note_img + '\'' +
+                ", username='" + username + '\'' +
+                ", time='" + time + '\'' +
                 '}';
     }
 }

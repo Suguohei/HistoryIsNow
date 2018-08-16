@@ -11,7 +11,7 @@ public class User extends DataSupport implements Serializable{
     private String password;
     private String email;
     private String img;
-    private List<Note> notes;
+
 
     public int getId() {
         return id;
@@ -53,13 +53,6 @@ public class User extends DataSupport implements Serializable{
         this.img = img;
     }
 
-    public List<Note> getNotes() {
-        return notes;
-    }
-
-    public void setNotes(List<Note> notes) {
-        this.notes = notes;
-    }
 
     @Override
     public String toString() {
@@ -69,7 +62,6 @@ public class User extends DataSupport implements Serializable{
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
                 ", img='" + img + '\'' +
-                ", notes=" + notes +
                 '}';
     }
 }

@@ -34,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/home/suguoqing/公共的/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/communication/ic_email_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/home/suguoqing/公共的/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_cancel_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -45,7 +45,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="outputName" value="img_emil" />
+                                      <entry key="outputName" value="img_cancel" />
                                     </map>
                                   </option>
                                 </PersistentState>
