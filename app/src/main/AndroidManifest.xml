@@ -38,7 +38,8 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".WriteNoteActivity"></activity>
+        <activity android:name=".WriteNoteActivity" />
+        <activity android:name=".EditAcitvity"></activity>
     </application>
 
 </manifest>

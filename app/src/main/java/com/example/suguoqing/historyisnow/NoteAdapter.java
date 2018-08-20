@@ -1,8 +1,10 @@
 package com.example.suguoqing.historyisnow;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +16,26 @@ import java.util.List;
 import java.util.zip.Inflater;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder>{
+    private static final String TAG = "NoteAdapter";
     private List<Note> notes;
     private Context mContext;
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.note_item,parent,false);
-        ViewHolder holder = new ViewHolder(view);
+        final ViewHolder holder = new ViewHolder(view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int postion = holder.getAdapterPosition();
+                Note currentNote = notes.get(postion);
+                Intent intent = new Intent(mContext,EditAcitvity.class);
+                intent.putExtra("currentNote",currentNote);
+                mContext.startActivity(intent);
+
+            }
+        });
 
         return holder;
     }

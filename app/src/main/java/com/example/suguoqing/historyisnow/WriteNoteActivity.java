@@ -73,7 +73,7 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
 
                 note.setDate(date);
                 note.setUsername(name);
-                note.setTime(new SimpleDateFormat("yyyy/MM/dd hh:mm:ss").format(new Date()));
+                note.setTime(new SimpleDateFormat("yyyy/M/dd hh:mm:ss").format(new Date()));
                 if(!("".equals(titlename) && "".equals(article))){
                     note.setTitle(titlename);
                     note.setContent(article);

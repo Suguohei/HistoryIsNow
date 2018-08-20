@@ -155,12 +155,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         reflashDrawer();
         if(selectedDate == null){
-            selectedDate = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+            selectedDate = new SimpleDateFormat("yyyy/M/dd").format(new Date());
             refreshNotes(username.getText().toString(),selectedDate);
         }else{
             refreshNotes(username.getText().toString(),selectedDate);
         }
-        Log.d(TAG, "onCreate: ssssssssssssss");
 
     }
 
@@ -277,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case 2:
                 if(resultCode == RESULT_OK){
+                    Log.d(TAG, "onActivityResult: zzzzzzzz");
                     String name = data.getStringExtra("name");
                     String date = data.getStringExtra("date");
                     refreshNotes(name,date);
@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void refreshNotes(String name,String date) {
         List<Note> notes = DataSupport.where("username = ? and date = ?", name,date).find(Note.class);
-        Log.d(TAG, "refreshNotes: aaa"+notes.size());
+        Log.d(TAG, "refreshNotes: aaa"+notes.size()+date+name);
         NoteAdapter adapter = new NoteAdapter(notes,this);
         LinearLayoutManager manager = new LinearLayoutManager(this);
         note_recycle.setLayoutManager(manager);
