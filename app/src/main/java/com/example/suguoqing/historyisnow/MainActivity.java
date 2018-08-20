@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private ImageView nav_backimg;
         private String selectedDate;
         private RecyclerView note_recycle;
+        private static int flag = 0;
+        String tempDate = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,23 +99,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //监听日历
         materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-
                 int year = date.getYear();
                 int month = date.getMonth();
                 int day = date.getDay();
                 selectedDate = year+"/"+(month+1)+"/"+day;
-                Toast.makeText(MainActivity.this, ""+year+"年"+(month+1)+"月"+day+"日", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(MainActivity.this,DetailActivity.class);
-                intent.putExtra("year",year);
-                intent.putExtra("month",month+1);
-                intent.putExtra("day",day);
-                startActivity(intent);
+                if (tempDate.equals(selectedDate)) {
+                    Toast.makeText(MainActivity.this, "jinqu", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this,DetailActivity.class);
+                    intent.putExtra("year",year);
+                    intent.putExtra("month",month+1);
+                    intent.putExtra("day",day);
+                    startActivity(intent);
+                }
+                tempDate = selectedDate;
+                reflashDrawer();
+                refreshNotes(username.getText().toString(),selectedDate);
 
             }
         });
+
         //默认选中
         Date date = new Date();
         materialCalendarView.setSelectedDate(date);
@@ -145,7 +153,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-
+        reflashDrawer();
+        if(selectedDate == null){
+            selectedDate = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+            refreshNotes(username.getText().toString(),selectedDate);
+        }else{
+            refreshNotes(username.getText().toString(),selectedDate);
+        }
+        Log.d(TAG, "onCreate: ssssssssssssss");
 
     }
 
@@ -221,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String name = (String) username.getText();
             Intent intent = new Intent(this,WriteNoteActivity.class);
             intent.putExtra("name",name);
+
             if(selectedDate == null){
                 SimpleDateFormat spformat = new SimpleDateFormat("yyyy/MM/dd");
                 selectedDate = spformat.format(new Date()).toString();
@@ -241,6 +257,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else {
             //获取这个user，根据username来获取
             String name = (String) username.getText();
+            Log.d(TAG, "handlerHead: "+name);
             Intent intent = new Intent(this,HeadInfoActivity.class);
             intent.putExtra("name",name);
             startActivityForResult(intent,1);
@@ -275,16 +292,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void refreshNotes(String name,String date) {
         List<Note> notes = DataSupport.where("username = ? and date = ?", name,date).find(Note.class);
         Log.d(TAG, "refreshNotes: aaa"+notes.size());
-        for(Note n : notes){
-            Log.d(TAG, "refreshNotes: aaa"+n);
-        }
-        if(notes != null && notes.size() != 0){
-           NoteAdapter adapter = new NoteAdapter(notes,this);
-            LinearLayoutManager manager = new LinearLayoutManager(this);
-            note_recycle.setLayoutManager(manager);
-            note_recycle.setAdapter(adapter);
-            note_recycle.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
-        }
+        NoteAdapter adapter = new NoteAdapter(notes,this);
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        note_recycle.setLayoutManager(manager);
+        note_recycle.setAdapter(adapter);
+        note_recycle.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
 
     }
 

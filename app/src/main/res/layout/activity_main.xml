@@ -40,7 +40,8 @@
                app:mcv_weekDayLabels="@array/weak"
                app:mcv_monthLabels="@array/month"
                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-               app:mcv_arrowColor="@color/colorAccent">
+               app:mcv_arrowColor="@color/colorAccent"
+               >
 
            </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
 
